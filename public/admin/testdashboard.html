@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        /* Set the size of the div element that contains the map */
+        #map {
+            height: 500px;
+            /* The height is 400 pixels */
+            width: 90%;
+            /* The width is the width of the web page */
+        }
+    </style>
+    <script src="assets/js/parse.min.js"></script>
+    <script src="assets/plugins/jquery/jquery.min.js"></script>
+    <script src="assets/js/parse_live_query.js"></script>
+</head>
+
+<body>
+    <h3>Tracking System - Admin Dashboard</h3>
+    <!--The div element for the map -->
+    <div style="display: flex; justify-content: space-around">
+        <div id="map"></div>
+        <div>
+            <select id="selectnv">
+                <option value="all">All</option>
+                <option value="nv1">Nguyen Van A</option>
+                <option value="nv2">Tran Van B</option>
+            </select>
+            <div id="nvlines"></div>
+
+        </div>
+    </div>
+    <footer>&copy; Copyright 2019 Green int co,ltd</footer>
+
+
+    <script>
+        //alert("hi");
+        var mMap;
+        //user status
+        var nvStatus = {};
+        nvStatus['nv1'] = 0;//offline
+        nvStatus['nv2'] = 0;//offline
+        //user move points
+        var nvPoints = {};
+        nvPoints['nv1'] = [];
+        nvPoints['nv2'] = [];
+        //user colors
+        var nvColors = {};
+        nvColors['nv1'] = '#FF1000';
+        nvColors['nv2'] = '#0080FF';
+        //user marker on map
+        var nvMarkers = {};
+        nvMarkers['nv1'] = [];
+        nvMarkers['nv2'] = [];
+        var currentSelect = "all";
+        // Initialize and add the map
+        function initMap() {
+            // The location of HCM 10.778945, 106.699917
+            var hcm = { lat: 10.778945, lng: 106.699917 };
+            // The map, centered at Uluru
+            mMap = new google.maps.Map(
+                document.getElementById('map'), { zoom: 17, center: hcm });
+            // The marker, positioned at Uluru
+            var marker = new google.maps.Marker({ position: hcm, map: mMap });
+            //delete api key google map web page at https://console.cloud.google.com/apis/credentials?project=elated-card-235314&folder&organizationId
+            $('#nvlines').html(generateNV1Html() + '<br>' + generateNV2Html());
+            //setInterval(function(){ alert("Hello"); }, 3000);
+        }
+
+        function refreshUserStatus(){
+            if (currentSelect == 'all') {
+                $('#nvlines').html(generateNV1Html() + '<br>' + generateNV2Html());
+            } else if (currentSelect == 'nv1') {
+                $('#nvlines').html(generateNV1Html());
+            } else if (currentSelect == 'nv2') {
+                $('#nvlines').html(generateNV2Html());
+            }
+        }
+        function drawPointForNV(point, userId) {
+            var marker = new google.maps.Marker({
+                position: point,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    strokeOpacity: 1,
+                    strokeColor: nvColors[userId],
+                    scale: 3
+                },
+                draggable: false,
+                map: mMap
+            });
+            if(!(currentSelect=='all'||currentSelect==userId))
+                marker.setVisible(false);
+            else if(currentSelect==userId)
+                mMap.panTo(point);//move map to current point
+            //store marker
+            nvMarkers[userId].push(marker);
+        }
+
+        function showHideMarketForNV(userId, isShow) {
+            for (var i = 0; i < nvMarkers[userId].length; i++) {
+                nvMarkers[userId][i].setVisible(isShow);
+            }
+        }
+
+        function XdrawPathForNV(userId) {
+            if (nvPoints[userId].length == 0)
+                return;
+            var lineSymbol = {
+                path: google.maps.SymbolPath.CIRCLE,
+                strokeOpacity: 1,
+                strokeColor: nvColors[userId],
+                scale: 3
+            };
+
+            var line = new google.maps.Polyline({
+                path: nvPoints[userId],
+                strokeOpacity: 0,
+                icons: [{
+                    icon: lineSymbol,
+                    offset: '0',
+                    repeat: '10px'
+                }],
+                map: mMap
+            });
+
+        }
+
+        $('#selectnv').on('change', function (e) {
+            var optionSelected = $("option:selected", this);
+            var valueSelected = this.value;
+            currentSelect = valueSelected;
+            if (valueSelected == 'all') {
+                showHideMarketForNV('nv1',true);
+                showHideMarketForNV('nv2',true);
+                $('#nvlines').html(generateNV1Html() + '<br>' + generateNV2Html());
+            } else if (valueSelected == 'nv1') {
+                $('#nvlines').html(generateNV1Html());
+                showHideMarketForNV('nv1',true);
+                showHideMarketForNV('nv2',false);
+            } else if (valueSelected == 'nv2') {
+                $('#nvlines').html(generateNV2Html());
+                showHideMarketForNV('nv1',false);
+                showHideMarketForNV('nv2',true);
+            }
+            //alert(valueSelected);
+        });
+        function generateNV1Html() {
+            var nv1html = '<p >';
+            nv1html += '<span>';
+            nv1html += '<div style="float: left;">';
+            if (nvStatus['nv1'])
+                nv1html += '<img src="assets/img/on.png" />';
+            else
+                nv1html += '<img src="assets/img/off.png" />';
+            nv1html += '</div>';
+            nv1html += '<small>Nguyen Van A</small>';
+            nv1html += '</span>';
+            nv1html += '</p>';
+            return nv1html;
+        }
+        function generateNV2Html() {
+            var nv1html = '<p >';
+            nv1html += '<span>';
+            nv1html += '<div style="float: left;">';
+            if (nvStatus['nv2'])
+                nv1html += '<img src="assets/img/on.png" />';
+            else
+                nv1html += '<img src="assets/img/off.png" />';
+            nv1html += '</div>';
+            nv1html += '<small>Tran Van B</small>';
+            nv1html += '</span>';
+            nv1html += '</p>';
+            return nv1html;
+        }
+
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATW57uk1DmXxQ_GorlxcPMUYTmwtLSg3g&callback=initMap">
+        </script>
+</body>
+
+</html>

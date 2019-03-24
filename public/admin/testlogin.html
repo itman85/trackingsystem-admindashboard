@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta name="description" content="Responsive Admin Template" />
+  <meta name="author" content="SmartUniversity" />
+  <title>Admin Login Page</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700" rel="stylesheet" type="text/css" />
+  <link href="fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+  <link href="fonts/material-design-icons/material-icon.css" rel="stylesheet" type="text/css" />
+  <link href="assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="assets/css/pages/extra_pages.css">
+  <link rel="shortcut icon" href="assets/img/favicon.ico" />
+  <script src="assets/js/parse.min.js" ></script>
+  <script src="assets/plugins/jquery/jquery.min.js"></script>
+  <script src="assets/js/pages/extra_pages/pages.js"></script>
+  <script>
+    $(function () {
+      var host = location.protocol + '//' + location.host;
+      Parse.initialize('v9SKMfSSx4WelTmWoqmg7cpN2adFd570Gg2p9G7u', 'yJsFAhqSMFMnv24CwVlY5Bjw4sJt2FkvgsHEMyZK');
+      Parse.serverURL = 'https://parseapi.back4app.com';
+      //alert(host)
+      $('#btnLogin').click(function () {        
+       // alert($("#username").val() + '-' + $("#password").val());      
+        Parse.Cloud.run("admin_system_login", {
+          //here you can pass the function request parameters
+          username: $("#username").val(),
+          password: $("#password").val()
+        }).then(function (result) {
+          //here you will handle the returned results (if function returned response.success())
+         // alert(result.token);
+          Parse.User.become(result.token).then(function (user) {
+            // The current user is now set to user.
+            if (user) {
+              window.location.replace(host + "/dashboard");
+            } else {
+              alert('Login failed!');
+            }
+          }, function (error) {
+            // The token could not be validated.
+            alert('Login error! ' + error.message);
+          });
+        }, function (error) {
+          //handle errors if called function returned response.error()
+          alert('Login error! ' + error.message);
+        });
+        return false;
+      });
+
+    });
+  </script>
+</head>
+
+<body>
+  <div class="form-title">
+    <h1>Tracking System</h1>
+  </div>
+  <div class="login-form text-center">
+    <div class="form formLogin" style="display: block;">
+      <h2>Admin Dashboard</h2>
+      <form>
+        <input type="text" placeholder="Username" id="username" />
+        <input type="password" placeholder="Password" id="password" />
+        <button id="btnLogin">LogIn</button>
+      </form>
+    </div>
+    <footer>&copy; Copyright 2019 Green int co,ltd</footer>
+  </div>
+  
+</body>
+
+</html>
