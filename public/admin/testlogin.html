@@ -32,17 +32,7 @@
         }).then(function (result) {
           //here you will handle the returned results (if function returned response.success())
          // alert(result.token);
-          Parse.User.become(result.token).then(function (user) {
-            // The current user is now set to user.
-            if (user) {
-              window.location.replace(host + "/dashboard");
-            } else {
-              alert('Login failed!');
-            }
-          }, function (error) {
-            // The token could not be validated.
-            alert('Login error! ' + error.message);
-          });
+         window.location.replace(host + "/dashboard");
         }, function (error) {
           //handle errors if called function returned response.error()
           alert('Login error! ' + error.message);
