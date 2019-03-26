@@ -16,7 +16,7 @@ $(function () {
     var subscriptionUserStatus = client.subscribe(queryUserStatus);
     subscriptionUserStatus.on('open', () => {
         console.log('subscription  user status opened');
-        alert('subcription user status opened');
+        //alert('subcription user status opened');
     });
     subscriptionUserStatus.on('update', (object) => {
         nvStatus[object.get("userid")] = object.get("status");
@@ -28,7 +28,8 @@ $(function () {
     var subscriptionLocations = client.subscribe(queryLocations);
     subscriptionLocations.on('open', () => {
         console.log('subscription location opened');
-        alert('subcription location opened');
+        //alert('subcription location opened');
+        $("#wsstatus").text("Connected");
     });
     subscriptionLocations.on('create', (object) => {
         var point = new google.maps.LatLng(object.get("lat"), object.get("lng"));
